@@ -1,16 +1,17 @@
 # TrimVideo
+
 //add maven in your project level gradle
 
 allprojects {
 	repositories {
 		...
-		maven { url 'https://jitpack.io' }
+		maven { url 'https://jitpack.io' 
+		}
 	}
 }
 
 // add dependency in module level gradle
  
- <samp>
  dependencies
 
 implementation 'com.github.Amankhan-mobipixels:TrimVideo:1.0'
