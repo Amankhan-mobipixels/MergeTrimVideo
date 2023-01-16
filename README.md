@@ -1,7 +1,5 @@
 # TrimVideo
-
 //add maven in your project level gradle
-
 
 allprojects {
 	repositories {
@@ -10,7 +8,6 @@ allprojects {
 	}
 }
 
-
 // add dependency in module level gradle
 
 dependencies {
@@ -18,4 +15,5 @@ dependencies {
 }
 
 How it works:
+
         TrimVideo.activity(inputpath,outputpath).start(this)
