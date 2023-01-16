@@ -1,11 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="VideoTrimmerTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="VideoTrimmerTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primaryDay</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorSecondary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item> //for menu icon color change
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="color">@color/white</item>
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
 
         <item name="android:windowCloseOnTouchOutside">true</item>
