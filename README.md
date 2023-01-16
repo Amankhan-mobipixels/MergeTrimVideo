@@ -12,7 +12,9 @@ allprojects {
 
 dependencies
 
+
 {implementation 'com.github.Amankhan-mobipixels:TrimVideo:1.0'}
+
 
 How it works:
 
