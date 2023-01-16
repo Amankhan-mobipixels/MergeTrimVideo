@@ -9,6 +9,7 @@ allprojects {
 }
 
 // add dependency in module level gradle
+ 
  dependencies
 
 implementation 'com.github.Amankhan-mobipixels:TrimVideo:1.0'
