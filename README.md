@@ -2,6 +2,7 @@
 
 //add maven in your project level gradle
 
+
 allprojects {
 
 	repositories {
@@ -10,6 +11,7 @@ allprojects {
 		}
 	}
 }
+
 
 // add dependency in module level gradle
  
