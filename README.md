@@ -2,12 +2,14 @@
 
 //add maven in your project level gradle
 
+
 allprojects {
 	repositories {
 		...
 		maven { url 'https://jitpack.io' }
 	}
 }
+
 
 // add dependency in module level gradle
 
