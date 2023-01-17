@@ -43,6 +43,8 @@ android {
         pickFirst 'lib/armeabi-v7a/libswscale.so'
     }
 }
+
+````
 if application crashes during video trimming
 add
 ````
