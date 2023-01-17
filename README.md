@@ -17,7 +17,7 @@ allprojects {
 ````
 dependencies:
 {
-implementation 'com.github.Amankhan-mobipixels:TrimVideo:0.0.1'
+implementation 'com.github.Amankhan-mobipixels:TrimVideo:v0.0.2'
 }
 
 ````
