@@ -9,14 +9,8 @@ android {
         pickFirst 'lib/x86_64/libc++_shared.so'
         pickFirst 'lib/armeabi-v7a/libc++_shared.so'
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
-
-        pickFirst 'lib/x86_64/libopencv_java3.so'
-        pickFirst 'lib/x86/libopencv_java3.so'
-        pickFirst 'lib/arm64-v8a/libopencv_java3.so'
-        pickFirst 'lib/armeabi-v7a/libopencv_java3.so'
-
+        pickFirst 'lib/arm64-v8a/libavcodec.so'
     }
-    rootProject.ext.ffmpegKitPackage = "video"
 
     defaultConfig {
         minSdkVersion 19
@@ -53,7 +47,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.Amankhan-mobipixels'
                 artifactId = 'TrimVideo'
-                version = '0.0.3'
+                version = '0.0.4'
             }
         }
     }
