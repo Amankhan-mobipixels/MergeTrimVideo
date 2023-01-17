@@ -51,6 +51,7 @@ ndk {
             abiFilters "armeabi","armeabi-v7a", "x86", "x86_64", "mips"
         }
 }
+````
 How to use:
 
         TrimVideo.activity(inputpath,outputpath).start(this)
