@@ -55,6 +55,7 @@ ndk {
 }
 ````
 How to use:
+
      //Trim video
            TrimVideo.activity(Environment.getExternalStorageDirectory().absolutePath + File.separator + "Download/hello.mp4",
            Environment.getExternalStorageDirectory().absolutePath + File.separator + "Download/video downloader").start(this)
