@@ -1,9 +1,8 @@
-package com.gowtham.library.ui.seekbar.widgets;
+package com.gowtham.ui.seekbar.widgets;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -20,8 +19,8 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 
 import com.gowtham.library.R;
-import com.gowtham.library.ui.seekbar.interfaces.OnSeekbarChangeListener;
-import com.gowtham.library.ui.seekbar.interfaces.OnSeekbarFinalValueListener;
+import com.gowtham.ui.seekbar.interfaces.OnSeekbarChangeListener;
+import com.gowtham.ui.seekbar.interfaces.OnSeekbarFinalValueListener;
 
 
 /**

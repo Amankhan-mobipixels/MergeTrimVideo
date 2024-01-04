@@ -1,23 +1,28 @@
-package com.gowtham.library.ui;
+package com.gowtham.ui;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.media.MediaMetadataRetriever;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -47,12 +53,12 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.gson.Gson;
 import com.gowtham.library.R;
-import com.gowtham.library.ui.seekbar.widgets.CrystalRangeSeekbar;
-import com.gowtham.library.ui.seekbar.widgets.CrystalSeekbar;
-import com.gowtham.library.utils.CompressOption;
-import com.gowtham.library.utils.TrimVideo;
-import com.gowtham.library.utils.TrimVideoOptions;
-import com.gowtham.library.utils.TrimmerUtils;
+import com.gowtham.ui.seekbar.widgets.CrystalRangeSeekbar;
+import com.gowtham.ui.seekbar.widgets.CrystalSeekbar;
+import com.gowtham.utils.CompressOption;
+import com.gowtham.utils.TrimVideo;
+import com.gowtham.utils.TrimVideoOptions;
+import com.gowtham.utils.TrimmerUtils;
 
 import java.io.File;
 import java.util.Calendar;
@@ -69,6 +75,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
     private ImageView[] imageViews;
     private long totalDuration;
     private Dialog dialog;
+    private String local;
     private Uri uri;
     private TextView txtStartDuration, txtEndDuration;
     private CrystalRangeSeekbar seekbar;
@@ -77,7 +84,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
     private MenuItem menuDone;
     private CrystalSeekbar seekbarController;
     private boolean isValidVideo = true, isVideoEnded;
-    private android.os.Handler seekHandler;
+    private Handler seekHandler;
     private Bundle bundle;
     private ProgressBar progressBar;
     private TrimVideoOptions trimVideoOptions;
@@ -100,7 +107,6 @@ public class ActVideoTrimmer extends AppCompatActivity {
     };
     private CompressOption compressOption;
     private String outputPath;
-    private String local;
     private int trimType;
     private long fixedGap, minGap, minFromGap, maxToGap;
     private boolean hidePlayerSeek, isAccurateCut, showFileLocationAlert;
@@ -165,7 +171,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
             videoPlayer = new ExoPlayer.Builder(this).build();
             playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
             playerView.setPlayer(videoPlayer);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 AudioAttributes audioAttributes = new AudioAttributes.Builder()
                         .setUsage(C.USAGE_MEDIA)
                         .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
@@ -456,39 +462,130 @@ public class ActVideoTrimmer extends AppCompatActivity {
             if (SystemClock.elapsedRealtime() - lastClickedTime < 800)
                 return true;
             lastClickedTime = SystemClock.elapsedRealtime();
-            trimVideo();
+          showDialogs();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void trimVideo() {
-        if (isValidVideo) {
-            //not exceed given maxDuration if has given
-            outputPath =  bundle.getString(TrimVideo.TRIM_Output);
-
-            videoPlayer.setPlayWhenReady(false);
-            showProcessingDialog();
-            String[] complexCommand;
-            if (compressOption != null)
-                complexCommand = getCompressionCmd();
-            else if (isAccurateCut) {
-                //no changes in video quality
-                //faster trimming command and given duration will be accurate
-                complexCommand = getAccurateCmd();
-            } else {
-                //no changes in video quality
-                //fastest trimming command however, result duration
-                //will be low accurate(2-3 secs)
-                complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
-                        "-i", String.valueOf(uri),
-                        "-t",
-                        TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
-                        "-async", "1", "-strict", "-2", "-c", "copy", outputPath};
+    public boolean isOnline(Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager != null) {
+                NetworkInfo mobileNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+                NetworkInfo wifiNetworkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                if (mobileNetworkInfo != null && mobileNetworkInfo.getState() == NetworkInfo.State.CONNECTED) {
+                    return true;
+                } else return wifiNetworkInfo != null && wifiNetworkInfo.getState() == NetworkInfo.State.CONNECTED;
             }
-            execFFmpegBinary(complexCommand, true);
-        } else
-            Toast.makeText(this, getString(R.string.txt_smaller) + " " + TrimmerUtils.getLimitedTimeFormatted(maxToGap), Toast.LENGTH_SHORT).show();
+        } else {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager != null) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR");
+                        return true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI");
+                        return true;
+                    } else return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
+                }
+            }
+        }
+        return false;
+    }
+
+    private void showDialogs() {
+    Dialog nameDialog = new Dialog(this, androidx.appcompat.R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+        nameDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        nameDialog.setCancelable(false);
+        nameDialog.setContentView(R.layout.namedialog);
+        EditText name = nameDialog.findViewById(R.id.name);
+        Button submit = nameDialog.findViewById(R.id.submit);
+        Button cancel = nameDialog.findViewById(R.id.cancel);
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!name.getText().toString().isEmpty()){
+                        File fileOutput = new File(bundle.getString(TrimVideo.TRIM_Output));
+
+                        if (!fileOutput.exists()){
+                            fileOutput.mkdir();
+                        }
+                        trimVideo(fileOutput.getAbsolutePath() +"/"+ name.getText().toString() + bundle.getString(TrimVideo.Extension));
+                        nameDialog.dismiss();
+
+//                        ProgressDialog progressDialog = new ProgressDialog(ActVideoTrimmer.this);
+//                        progressDialog.setTitle("Ad Loading");
+//                        progressDialog.setCancelable(false);
+//                        progressDialog.show();
+
+//                        loadShowInterstitialAd(ActVideoTrimmer.this, getString(R.string.Id_Interstitial),(loaded, failed, showed, dismissed) -> {
+//                            if (showed){
+//                                progressDialog.cancel();
+//                                String time = String.valueOf((Calendar.getInstance().getTimeInMillis()));
+//                                trimVideo(bundle.getString(TrimVideo.TRIM_Output)+name.getText().toString()+"_"+time+bundle.getString(TrimVideo.Extension));
+//                                nameDialog.dismiss();
+//                            }
+//                            if (failed){
+//                                progressDialog.cancel();
+//                                String time = String.valueOf((Calendar.getInstance().getTimeInMillis()));
+//                                trimVideo(bundle.getString(TrimVideo.TRIM_Output)+name.getText().toString()+"_"+time+bundle.getString(TrimVideo.Extension));
+//                                nameDialog.dismiss();
+//                            }
+//                            return null;
+//                        });
+                }
+                else{
+                    Toast.makeText(ActVideoTrimmer.this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { nameDialog.dismiss(); }
+        });
+        nameDialog.show();
+    }
+    private void trimVideo(String outPAth) {
+        if (!new File(outPAth).exists()) {
+            if (isValidVideo) {
+                //not exceed given maxDuration if has given
+                outputPath = outPAth;
+
+                videoPlayer.setPlayWhenReady(false);
+                showProcessingDialog();
+                String[] complexCommand;
+                if (compressOption != null && !bundle.getString(TrimVideo.Extension).equals(".aac")) {
+                    complexCommand = getCompressionCmd();
+                    Log.d("fdfd", "compression");
+                } else if (!isAccurateCut) {
+                    //no changes in video quality
+                    //faster trimming command and given duration will be accurate
+                    complexCommand = getAccurateCmd();
+                    Log.d("fdfd", "fastest");
+                } else {
+                    Log.d("fdfd", "delay");
+
+                    //no changes in video quality
+                    //fastest trimming command however, result duration
+                    //will be low accurate(2-3 secs)
+                    complexCommand = new String[]{"-ss", TrimmerUtils.formatCSeconds(lastMinValue),
+                            "-i", String.valueOf(uri),
+                            "-t",
+                            TrimmerUtils.formatCSeconds(lastMaxValue - lastMinValue),
+                            "-async", "1", "-strict", "-2", "-c", "copy", outputPath};
+                }
+                execFFmpegBinary(complexCommand, true);
+            } else
+                Toast.makeText(this, getString(R.string.txt_smaller) + " " + TrimmerUtils.getLimitedTimeFormatted(maxToGap), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(this, getString(R.string.file_name_exist), Toast.LENGTH_SHORT).show();
+        }
     }
 
 //    private String getFileName() {
@@ -555,13 +652,18 @@ public class ActVideoTrimmer extends AppCompatActivity {
     }
 
     private void execFFmpegBinary(final String[] command, boolean retry) {
+        Log.d("dsfjh", outputPath);
         try {
             new Thread(() -> {
                 int result = FFmpeg.execute(command);
                 if (result == 0) {
                     dialog.dismiss();
-                    runOnUiThread(() ->
-                            Toast.makeText(ActVideoTrimmer.this, "Successful", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> {
+                        Toast.makeText(ActVideoTrimmer.this, "Successful", Toast.LENGTH_SHORT).show();
+//                        Intent intent = (new Intent(this, VideoPlayer.class));
+//                        intent.putExtra("videoData", outputPath);
+//                        startActivity(intent);
+                    });
                 } else if (result == 255) {
                     if (dialog.isShowing())
                         dialog.dismiss();
@@ -569,7 +671,10 @@ public class ActVideoTrimmer extends AppCompatActivity {
                     // Failed case:
                     // line 489 command fails on some devices in
                     // that case retrying with accurateCmt as alternative command
-                    if (retry && !isAccurateCut && compressOption == null) {
+//                    if (retry && !isAccurateCut && compressOption == null)
+                    if (retry)
+                    {
+                        Log.d("fdfd", String.valueOf(isAccurateCut));
                         File newFile = new File(outputPath);
                         if (newFile.exists())
                             newFile.delete();
@@ -585,6 +690,7 @@ public class ActVideoTrimmer extends AppCompatActivity {
 
 
         } catch (Exception e) {
+            Log.d("fdfd", String.valueOf(e.getMessage()));
             e.printStackTrace();
         }
     }

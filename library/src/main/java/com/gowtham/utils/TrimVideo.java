@@ -1,23 +1,22 @@
-package com.gowtham.library.utils;
+package com.gowtham.utils;
+
+import static com.google.common.io.Files.getFileExtension;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import com.google.gson.Gson;
-import com.gowtham.library.ui.ActVideoTrimmer;
+import com.gowtham.ui.ActVideoTrimmer;
 
 public class TrimVideo {
 
-    public static final String TRIM_VIDEO_OPTION = "trim_video_option", TRIM_VIDEO_URI = "trim_video_uri" , TRIM_Output = "TRIM_Output";
+    public static final String TRIM_VIDEO_OPTION = "trim_video_option", TRIM_VIDEO_URI = "trim_video_uri" , TRIM_Output = "TRIM_Output",Extension="extension";
 
-    public static ActivityBuilder activity(String input, String output) {
-        return new ActivityBuilder(input,output);
+    public static ActivityBuilder activity(String input, String dirOutput) {
+        return new ActivityBuilder(input,dirOutput);
     }
 
     public static final class ActivityBuilder {
@@ -25,11 +24,13 @@ public class TrimVideo {
         @Nullable
         private final String videoUri;
         private final String output;
+        private final String extensions;
         private final TrimVideoOptions options;
 
         public ActivityBuilder(@Nullable String input,@Nullable String output) {
             this.videoUri = input;
             this.output=output;
+            this.extensions = "."+getFileExtension(input);
             options = new TrimVideoOptions();
             options.trimType=TrimType.DEFAULT;
             options.compressOption = new CompressOption();
@@ -40,6 +41,7 @@ public class TrimVideo {
             Gson gson = new Gson();
             Bundle bundle=new Bundle();
             bundle.putString(TRIM_VIDEO_URI, videoUri);
+            bundle.putString(Extension, extensions);
             bundle.putString(TRIM_VIDEO_OPTION, gson.toJson(options));
             bundle.putString(TRIM_Output,output);
             intent.putExtras(bundle);

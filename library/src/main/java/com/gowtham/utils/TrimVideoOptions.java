@@ -1,4 +1,4 @@
-package com.gowtham.library.utils;
+package com.gowtham.utils;
 
 public class TrimVideoOptions {
 

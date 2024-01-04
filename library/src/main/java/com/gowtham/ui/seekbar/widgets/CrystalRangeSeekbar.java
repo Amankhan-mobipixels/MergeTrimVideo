@@ -1,4 +1,4 @@
-package com.gowtham.library.ui.seekbar.widgets;
+package com.gowtham.ui.seekbar.widgets;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -19,8 +19,8 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 
 import com.gowtham.library.R;
-import com.gowtham.library.ui.seekbar.interfaces.OnRangeSeekbarChangeListener;
-import com.gowtham.library.ui.seekbar.interfaces.OnRangeSeekbarFinalValueListener;
+import com.gowtham.ui.seekbar.interfaces.OnRangeSeekbarChangeListener;
+import com.gowtham.ui.seekbar.interfaces.OnRangeSeekbarFinalValueListener;
 
 
 /**

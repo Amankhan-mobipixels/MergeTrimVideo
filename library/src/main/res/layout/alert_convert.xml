@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/VView"
     android:gravity="center_horizontal"
-    android:background="#303030"
+    android:background="?color"
     android:padding="14dp">
 
     <ProgressBar
@@ -10,6 +10,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="5dp"
+        android:backgroundTint="#303030"
         />
 <!--
   android:max="100"
@@ -20,7 +21,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
         android:id="@+id/txt_process"
-        android:textColor="@color/colorWhite"
+        android:textColor="?colorAccent"
         android:text="@string/txt_trimming_video"/>
 
     <TextView
@@ -32,6 +33,6 @@
         android:clickable="true"
         android:id="@+id/txt_cancel"
         android:focusable="true"
-        android:textColor="@color/colorAccent"
+        android:textColor="?colorAccent"
         android:text="@string/txt_cancel"/>
 </LinearLayout>

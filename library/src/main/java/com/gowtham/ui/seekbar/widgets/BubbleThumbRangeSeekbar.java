@@ -1,4 +1,4 @@
-package com.gowtham.library.ui.seekbar.widgets;
+package com.gowtham.ui.seekbar.widgets;
 
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
