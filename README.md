@@ -17,7 +17,7 @@ allprojects {
 ````
 dependencies:
 {
-implementation 'com.github.Amankhan-mobipixels:TrimVideo:v0.0.2'
+implementation 'com.github.Amankhan-mobipixels:TrimVideo:1.0.0'
 }
 
 ````
@@ -55,5 +55,11 @@ ndk {
 }
 ````
 How to use:
+     //Trim video
+           TrimVideo.activity(Environment.getExternalStorageDirectory().absolutePath + File.separator + "Download/hello.mp4",
+           Environment.getExternalStorageDirectory().absolutePath + File.separator + "Download/video downloader").start(this)
 
-        TrimVideo.activity(inputpath,outputpath).start(this)
+    //Merge videos
+           val result = dataMerge().execute(context,listofvideos,outputfilepathwithextension)
+           if (result == 0) { }
+           else { }
